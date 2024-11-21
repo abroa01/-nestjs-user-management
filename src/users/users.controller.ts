@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, 
     Patch, Post, Query } from '@nestjs/common';
+import { UsersService } from './users.service';
 
 @Controller('users') // --> Decorator 
 export class UsersController {
@@ -18,29 +19,31 @@ export class UsersController {
     
     */
 
+    constructor(private readonly usersService: UsersService){}
+
     @Get() //GET /users or /users?role=value
     findAll(@Query('role')role?: 'INTERN' | 'ADMIN' | 'ENGINEER'){
-        return []
+        return [this.usersService.findAll(role)]
     }
     @Get(':id') //GET users by id
     findOne(@Param('id') id: string){
-        return { id }
+       return this.usersService.findOne(+id) // '+' is uniary plus used to conversion from dstring to nuber
 
     } 
 
     @Post() //POST users 
-    create(@Body() users: {}){
-        return users
+    create(@Body() user: {name: string, email: string, role: 'INTERN' | 'ENGINEER' | 'ADMIN'}){
+        return this.usersService.create(user)
     }
     
     @Patch(':id') //Patch users by id
-    update(@Param('id') id: string, @Body() userUpdate: {}){
-        return { id, ...userUpdate }
+    update(@Param('id') id: string, @Body() userUpdate: {name?:string, email?: string, role?: 'INTERN' | 'ENGINEER' | 'ADMIN'}){
+        return this.usersService.update(+id, userUpdate)
 
     } 
     @Delete(':id')
     delete(@Param('id') id: string){
-        return { id }
+        return this.usersService.delete(+id)
     }
 
 
